@@ -1,5 +1,13 @@
 // In-memory data store (replace with actual database in production)
-let users = [
+interface UserData {
+  id: number;
+  name: string;
+  email: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+let users: UserData[] = [
   { id: 1, name: 'John Doe', email: 'john@example.com' },
   { id: 2, name: 'Jane Smith', email: 'jane@example.com' }
 ];
@@ -8,19 +16,19 @@ let nextId = 3;
 
 class User {
   // Get all users
-  static findAll() {
+  static findAll(): Promise<UserData[]> {
     return Promise.resolve(users);
   }
 
   // Get user by ID
-  static findById(id) {
-    const user = users.find(u => u.id === parseInt(id));
+  static findById(id: string | number): Promise<UserData | undefined> {
+    const user = users.find(u => u.id === parseInt(id as string));
     return Promise.resolve(user);
   }
 
   // Create new user
-  static create(userData) {
-    const newUser = {
+  static create(userData: { name: string; email: string }): Promise<UserData> {
+    const newUser: UserData = {
       id: nextId++,
       ...userData,
       createdAt: new Date().toISOString()
@@ -30,8 +38,8 @@ class User {
   }
 
   // Update user
-  static update(id, userData) {
-    const index = users.findIndex(u => u.id === parseInt(id));
+  static update(id: string | number, userData: { name?: string; email?: string }): Promise<UserData | null> {
+    const index = users.findIndex(u => u.id === parseInt(id as string));
     if (index === -1) {
       return Promise.resolve(null);
     }
@@ -46,8 +54,8 @@ class User {
   }
 
   // Delete user
-  static delete(id) {
-    const index = users.findIndex(u => u.id === parseInt(id));
+  static delete(id: string | number): Promise<boolean> {
+    const index = users.findIndex(u => u.id === parseInt(id as string));
     if (index === -1) {
       return Promise.resolve(false);
     }
@@ -57,4 +65,5 @@ class User {
   }
 }
 
-module.exports = User;
+export default User;
+

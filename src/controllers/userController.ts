@@ -1,7 +1,8 @@
-const User = require('../models/User');
+import { Request, Response } from 'express';
+import User from '../models/User';
 
 // Get all users
-exports.getAllUsers = async (req, res) => {
+export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
   try {
     const users = await User.findAll();
     res.status(200).json({
@@ -11,20 +12,21 @@ exports.getAllUsers = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 };
 
 // Get user by ID
-exports.getUserById = async (req, res) => {
+export const getUserById = async (req: Request, res: Response): Promise<void> => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         error: 'User not found'
       });
+      return;
     }
     res.status(200).json({
       success: true,
@@ -33,21 +35,22 @@ exports.getUserById = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 };
 
 // Create new user
-exports.createUser = async (req, res) => {
+export const createUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { name, email } = req.body;
     
     if (!name || !email) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         error: 'Name and email are required'
       });
+      return;
     }
 
     const user = await User.create({ name, email });
@@ -58,23 +61,24 @@ exports.createUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 };
 
 // Update user
-exports.updateUser = async (req, res) => {
+export const updateUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { name, email } = req.body;
 
     const user = await User.update(id, { name, email });
     if (!user) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         error: 'User not found'
       });
+      return;
     }
 
     res.status(200).json({
@@ -84,22 +88,23 @@ exports.updateUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 };
 
 // Delete user
-exports.deleteUser = async (req, res) => {
+export const deleteUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const deleted = await User.delete(id);
     
     if (!deleted) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         error: 'User not found'
       });
+      return;
     }
 
     res.status(200).json({
@@ -109,7 +114,8 @@ exports.deleteUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 };
+

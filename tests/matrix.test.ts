@@ -1,4 +1,5 @@
-const Matrix = require('../models/Matrix');
+import { Matrix } from '../src/models/Matrix';
+import { add, multiply } from '../src/operations';
 
 describe('Matrix Class', () => {
   describe('Constructor and Validation', () => {
@@ -11,9 +12,9 @@ describe('Matrix Class', () => {
     });
 
     test('should throw error for non-array input', () => {
-      expect(() => new Matrix('not an array')).toThrow('Matrix data must be an array');
-      expect(() => new Matrix(123)).toThrow('Matrix data must be an array');
-      expect(() => new Matrix(null)).toThrow('Matrix data must be an array');
+      expect(() => new (Matrix as any)('not an array')).toThrow('Matrix data must be an array');
+      expect(() => new (Matrix as any)(123)).toThrow('Matrix data must be an array');
+      expect(() => new (Matrix as any)(null)).toThrow('Matrix data must be an array');
     });
 
     test('should throw error for empty array', () => {
@@ -21,7 +22,7 @@ describe('Matrix Class', () => {
     });
 
     test('should throw error for 1D array', () => {
-      expect(() => new Matrix([1, 2, 3])).toThrow('Matrix data must be a 2D array');
+      expect(() => new (Matrix as any)([1, 2, 3])).toThrow('Matrix data must be a 2D array');
     });
 
     test('should throw error for empty rows', () => {
@@ -33,9 +34,9 @@ describe('Matrix Class', () => {
     });
 
     test('should throw error for non-numeric values', () => {
-      expect(() => new Matrix([[1, 2], [3, 'a']])).toThrow('All matrix elements must be valid numbers');
-      expect(() => new Matrix([[1, 2], [3, NaN]])).toThrow('All matrix elements must be valid numbers');
-      expect(() => new Matrix([[1, 2], [3, null]])).toThrow('All matrix elements must be valid numbers');
+      expect(() => new (Matrix as any)([[1, 2], [3, 'a']])).toThrow('All matrix elements must be valid numbers');
+      expect(() => new (Matrix as any)([[1, 2], [3, NaN]])).toThrow('All matrix elements must be valid numbers');
+      expect(() => new (Matrix as any)([[1, 2], [3, null]])).toThrow('All matrix elements must be valid numbers');
     });
 
     test('should handle single row matrix', () => {
@@ -66,7 +67,7 @@ describe('Matrix Class', () => {
     });
 
     test('should throw error if fromArray receives invalid input', () => {
-      expect(() => Matrix.fromArray('invalid')).toThrow('Matrix data must be an array');
+      expect(() => Matrix.fromArray('invalid' as any)).toThrow('Matrix data must be an array');
     });
   });
 
@@ -79,11 +80,11 @@ describe('Matrix Class', () => {
     });
   });
 
-  describe('Matrix Addition', () => {
+  describe('Matrix Addition Operation', () => {
     test('should add two matrices of same dimensions', () => {
       const matrixA = new Matrix([[1, 2], [3, 4]]);
       const matrixB = new Matrix([[5, 6], [7, 8]]);
-      const result = matrixA.add(matrixB);
+      const result = add(matrixA, matrixB);
       
       expect(result.rows).toBe(2);
       expect(result.columns).toBe(2);
@@ -93,7 +94,7 @@ describe('Matrix Class', () => {
     test('should add matrices with negative numbers', () => {
       const matrixA = new Matrix([[1, -2], [-3, 4]]);
       const matrixB = new Matrix([[5, -6], [-7, 8]]);
-      const result = matrixA.add(matrixB);
+      const result = add(matrixA, matrixB);
       
       expect(result.data).toEqual([[6, -8], [-10, 12]]);
     });
@@ -101,7 +102,7 @@ describe('Matrix Class', () => {
     test('should add matrices with floating point numbers', () => {
       const matrixA = new Matrix([[1.5, 2.3], [3.1, 4.7]]);
       const matrixB = new Matrix([[0.5, 1.7], [2.9, 3.3]]);
-      const result = matrixA.add(matrixB);
+      const result = add(matrixA, matrixB);
       
       expect(result.data[0][0]).toBeCloseTo(2.0);
       expect(result.data[0][1]).toBeCloseTo(4.0);
@@ -113,27 +114,20 @@ describe('Matrix Class', () => {
       const matrixA = new Matrix([[1, 2], [3, 4]]);
       const matrixB = new Matrix([[5, 6]]);
       
-      expect(() => matrixA.add(matrixB)).toThrow('Matrices must have the same dimensions for addition');
+      expect(() => add(matrixA, matrixB)).toThrow('Matrices must have the same dimensions for addition');
     });
 
     test('should throw error for different column dimensions', () => {
       const matrixA = new Matrix([[1, 2], [3, 4]]);
       const matrixB = new Matrix([[5, 6, 7], [8, 9, 10]]);
       
-      expect(() => matrixA.add(matrixB)).toThrow('Matrices must have the same dimensions for addition');
-    });
-
-    test('should throw error for non-Matrix argument', () => {
-      const matrixA = new Matrix([[1, 2], [3, 4]]);
-      
-      expect(() => matrixA.add([[5, 6], [7, 8]])).toThrow('Argument must be a Matrix instance');
-      expect(() => matrixA.add('not a matrix')).toThrow('Argument must be a Matrix instance');
+      expect(() => add(matrixA, matrixB)).toThrow('Matrices must have the same dimensions for addition');
     });
 
     test('should add 1x1 matrices', () => {
       const matrixA = new Matrix([[5]]);
       const matrixB = new Matrix([[3]]);
-      const result = matrixA.add(matrixB);
+      const result = add(matrixA, matrixB);
       
       expect(result.data).toEqual([[8]]);
     });
@@ -144,18 +138,18 @@ describe('Matrix Class', () => {
       const originalA = JSON.stringify(matrixA.data);
       const originalB = JSON.stringify(matrixB.data);
       
-      matrixA.add(matrixB);
+      add(matrixA, matrixB);
       
       expect(JSON.stringify(matrixA.data)).toBe(originalA);
       expect(JSON.stringify(matrixB.data)).toBe(originalB);
     });
   });
 
-  describe('Matrix Multiplication', () => {
+  describe('Matrix Multiplication Operation', () => {
     test('should multiply two compatible matrices', () => {
       const matrixA = new Matrix([[1, 2], [3, 4]]);
       const matrixB = new Matrix([[5, 6], [7, 8]]);
-      const result = matrixA.multiply(matrixB);
+      const result = multiply(matrixA, matrixB);
       
       expect(result.rows).toBe(2);
       expect(result.columns).toBe(2);
@@ -167,7 +161,7 @@ describe('Matrix Class', () => {
     test('should multiply matrices with different dimensions (compatible)', () => {
       const matrixA = new Matrix([[1, 2, 3]]); // 1x3
       const matrixB = new Matrix([[4], [5], [6]]); // 3x1
-      const result = matrixA.multiply(matrixB);
+      const result = multiply(matrixA, matrixB);
       
       expect(result.rows).toBe(1);
       expect(result.columns).toBe(1);
@@ -178,7 +172,7 @@ describe('Matrix Class', () => {
     test('should multiply 3x2 by 2x3 to get 3x3', () => {
       const matrixA = new Matrix([[1, 2], [3, 4], [5, 6]]);
       const matrixB = new Matrix([[7, 8, 9], [10, 11, 12]]);
-      const result = matrixA.multiply(matrixB);
+      const result = multiply(matrixA, matrixB);
       
       expect(result.rows).toBe(3);
       expect(result.columns).toBe(3);
@@ -190,26 +184,20 @@ describe('Matrix Class', () => {
       const matrixA = new Matrix([[1, 2], [3, 4]]); // 2x2
       const matrixB = new Matrix([[5, 6, 7], [8, 9, 10], [11, 12, 13]]); // 3x3
       
-      expect(() => matrixA.multiply(matrixB)).toThrow('Matrices have incompatible dimensions for multiplication');
+      expect(() => multiply(matrixA, matrixB)).toThrow('Matrices have incompatible dimensions for multiplication');
     });
 
     test('should throw error when first matrix columns != second matrix rows', () => {
       const matrixA = new Matrix([[1, 2, 3]]); // 1x3
       const matrixB = new Matrix([[4, 5], [6, 7]]); // 2x2
       
-      expect(() => matrixA.multiply(matrixB)).toThrow('Matrices have incompatible dimensions for multiplication');
-    });
-
-    test('should throw error for non-Matrix argument', () => {
-      const matrixA = new Matrix([[1, 2], [3, 4]]);
-      
-      expect(() => matrixA.multiply([[5, 6], [7, 8]])).toThrow('Argument must be a Matrix instance');
+      expect(() => multiply(matrixA, matrixB)).toThrow('Matrices have incompatible dimensions for multiplication');
     });
 
     test('should multiply with negative numbers', () => {
       const matrixA = new Matrix([[1, -2], [-3, 4]]);
       const matrixB = new Matrix([[5, 6], [-7, 8]]);
-      const result = matrixA.multiply(matrixB);
+      const result = multiply(matrixA, matrixB);
       
       // [1*5+(-2)*(-7), 1*6+(-2)*8] = [19, -10]
       // [(-3)*5+4*(-7), (-3)*6+4*8] = [-43, 14]
@@ -219,7 +207,7 @@ describe('Matrix Class', () => {
     test('should multiply with floating point numbers', () => {
       const matrixA = new Matrix([[1.5, 2.5], [3.5, 4.5]]);
       const matrixB = new Matrix([[0.5, 1.5], [2.5, 3.5]]);
-      const result = matrixA.multiply(matrixB);
+      const result = multiply(matrixA, matrixB);
       
       expect(result.data[0][0]).toBeCloseTo(7.0); // 1.5*0.5 + 2.5*2.5
       expect(result.data[0][1]).toBeCloseTo(11.0); // 1.5*1.5 + 2.5*3.5
@@ -231,7 +219,7 @@ describe('Matrix Class', () => {
       const originalA = JSON.stringify(matrixA.data);
       const originalB = JSON.stringify(matrixB.data);
       
-      matrixA.multiply(matrixB);
+      multiply(matrixA, matrixB);
       
       expect(JSON.stringify(matrixA.data)).toBe(originalA);
       expect(JSON.stringify(matrixB.data)).toBe(originalB);
